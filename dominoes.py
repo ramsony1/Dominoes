@@ -23,8 +23,17 @@ while not status:
     computer, player, stock = domino_pieces[:7], domino_pieces[7:14], domino_pieces[14:]
     status = starter_piece()
 
-print("Stock pieces:", stock)
-print("Computer pieces:", computer)
-print("Player pieces", player)
-print("Domino snake:", snake)
-print("Status:", status)
+print("=" * 70)
+print(f"Stock size: {len(stock)}")
+print(f'Computer size: {len(computer)}\n')
+print(snake[0])
+print("\nYour pieces:")
+n = 1
+for i in player:
+    print(f'{n}:{i}')
+    n += 1
+if status == "player":
+    print("Status: It's your turn to make a move. Enter your command.")
+else:
+    print("Status: Computer is about to make a move. Press Enter to continue...")
+
