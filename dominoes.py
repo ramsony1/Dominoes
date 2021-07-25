@@ -43,24 +43,26 @@ def display_output():
         n += 1
 
 
+def check_input(move_input):
+    while True:
+        try:
+            if abs(int(move_input)) > len(player):
+                move_input = int(input("Number too high. Enter your command."))
+            return move_input
+        except ValueError:
+            move_input = input("Invalid input. Please try again.")
+
+
 while True:
     display_output()
-    if status == "player":
+    if (snake[0][0] == snake[-1][1] and sum(x.count(snake[0][0]) for x in snake) == 8) or len(stock) == 0:
+        print('\nStatus: The game is over. It\'s a draw!')
+        break
+    elif status == "player":
         move = input("Status: It's your turn to make a move. Enter your command.")
-        try:
-            player_digit = int(move)
-            while abs(player_digit) > len(player):
-                player_digit = int(input("Number too high. Enter your command."))
-        except ValueError:
-            while True:
-                move = input("Invalid input. Please try again.")
-                try:
-                    player_digit = int(move)
-                    while abs(player_digit) > len(player):
-                        player_digit = int(input("Number too high. Enter your command."))
-                    break
-                except ValueError:
-                    pass
+        move_val = check_input(move)
+        player_digit = int(move_val)
+
         if player_digit < 0:
             snake = [player[abs(player_digit) - 1]] + snake
             player.remove(player[abs(player_digit) - 1])
