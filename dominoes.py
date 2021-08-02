@@ -1,4 +1,3 @@
-import itertools
 import random
 
 snake, stock, player, computer = [], [], [], []
@@ -34,7 +33,7 @@ def display_output():
         for i in snake:
             print(i, end='')
     else:
-        print(*snake[0:3], '...', *snake[-3:], sep='')
+        print('\n', *snake[0:3], '...', *snake[-3:], sep='')
 
     print("\nYour pieces:")
     n = 1
@@ -47,55 +46,86 @@ def check_input(move_input):
     while True:
         try:
             if abs(int(move_input)) > len(player):
-                move_input = int(input("Number too high. Enter your command."))
+                move_input = int(input("Invalid input. Please try again."))
             return move_input
         except ValueError:
             move_input = input("Invalid input. Please try again.")
 
 
+def left_rules(list_1, list_2):
+    if list_1[0][0] == list_2[1]:
+        return True, list_2[1]
+    list_2.reverse()
+    if list_1[0][0] == list_2[1]:
+        return True, list_2[1]
+
+
+def right_rule(list_1, list_2):
+    if list_1[-1][1] == list_2[0]:
+        return True, list_2[0]
+    list_2.reverse()
+    if list_1[-1][1] == list_2[0]:
+        return True, list_2[0]
+    return False
+
+
+def check_illegal_move():
+    global move, player_digit, player_move_val
+    move = input("Illegal move. Please try again.")
+    player_digit = int(check_input(move))
+
+
 while True:
     display_output()
     if (snake[0][0] == snake[-1][1] and sum(x.count(snake[0][0]) for x in snake) == 8) or len(stock) == 0:
-        print('\nStatus: The game is over. It\'s a draw!')
+        print("Status: The game is over. It's a draw!")
+        break
+    if len(player) == 0:
+        print("Status: The game is over. You won!")
+        break
+    if len(computer) == 0:
+        print("Status: The game is over. The computer won!")
         break
     elif status == "player":
         move = input("Status: It's your turn to make a move. Enter your command.")
-        move_val = check_input(move)
-        player_digit = int(move_val)
-
-        if player_digit < 0:
-            snake = [player[abs(player_digit) - 1]] + snake
-            player.remove(player[abs(player_digit) - 1])
-            status = "computer"
-        elif player_digit == 0:
-            player = player + [stock[0]]
-            stock.remove(stock[0])
-            status = "computer"
-        else:
-            snake = snake + [player[player_digit - 1]]
-            player.remove(player[player_digit - 1])
-            if len(player) == 0:
-                display_output()
-                print("Status: The game is over. You won!")
+        player_digit = int(check_input(move))
+        while True:
+            player_move_val = player[abs(player_digit) - 1]
+            if player_digit < 0:
+                if left_rules(snake, player_move_val):
+                    snake = [player_move_val] + snake
+                    player.remove(player_move_val)
+                    break
+                check_illegal_move()
+            elif player_digit == 0:
+                player = player + [stock[0]]
+                stock.remove(stock[0])
                 break
-            status = "computer"
+            else:
+                if right_rule(snake, player_move_val):
+                    snake = snake + [player_move_val]
+                    player.remove(player_move_val)
+                    break
+                check_illegal_move()
+        status = "computer"
 
     else:
         move = input("Status: Computer is about to make a move. Press Enter to continue...")
-        computer_digit = random.choice(range(-len(computer), len(computer)))
-        if computer_digit < 0:
-            snake = [computer[abs(computer_digit) - 1]] + snake
-            computer.remove(computer[abs(computer_digit) - 1])
-            status = "player"
-        elif computer_digit == 0:
-            computer = computer + [stock[0]]
-            stock.remove(stock[0])
-            status = "player"
-        else:
-            snake = snake + [computer[computer_digit - 1]]
-            computer.remove(computer[computer_digit - 1])
-            if len(computer) == 0:
-                display_output()
-                print("Status: The game is over. You won!")
+        while True:
+            computer_digit = random.choice(range(-len(computer), len(computer)))
+            comp_move_val = computer[abs(computer_digit) - 1]
+            if computer_digit < 0:
+                if left_rules(snake, comp_move_val):
+                    snake = [comp_move_val] + snake
+                    computer.remove(comp_move_val)
+                    break
+            elif computer_digit == 0:
+                computer = computer + [stock[0]]
+                stock.remove(stock[0])
                 break
-            status = "player"
+            else:
+                if right_rule(snake, comp_move_val):
+                    snake = snake + [comp_move_val]
+                    computer.remove(comp_move_val)
+                    break
+        status = "player"
