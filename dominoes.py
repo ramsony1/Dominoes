@@ -2,6 +2,7 @@ import random
 
 snake, stock, player, computer = [], [], [], []
 status = ""
+count_dict = {0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0}
 
 
 def starter_piece():
@@ -75,6 +76,17 @@ def check_illegal_move():
     player_digit = int(check_input(move))
 
 
+def count_comp_val(computer_, snakes, count_):
+    for i in snakes:
+        for j in i:
+            if j in count_:
+                count_[j] += 1
+    for i in computer_:
+        for j in i:
+            if j in count_:
+                count_[j] += 1
+
+
 while True:
     display_output()
     if (snake[0][0] == snake[-1][1] and sum(x.count(snake[0][0]) for x in snake) == 8) or len(stock) == 0:
@@ -111,21 +123,23 @@ while True:
 
     else:
         move = input("Status: Computer is about to make a move. Press Enter to continue...")
+        count_comp_val(computer, snake, count_dict)
+        score = {}
+        max_ = []
+        for x in range(len(computer)):
+            score.update({count_dict[computer[x][0]] + count_dict[computer[x][1]]: computer[x]})
         while True:
-            computer_digit = random.choice(range(-len(computer), len(computer)))
-            comp_move_val = computer[abs(computer_digit) - 1]
-            if computer_digit < 0:
-                if left_rules(snake, comp_move_val):
-                    snake = [comp_move_val] + snake
-                    computer.remove(comp_move_val)
-                    break
-            elif computer_digit == 0:
+            max_score = score.pop(max(score))
+            if left_rules(snake, max_score):
+                snake = [max_score] + snake
+                computer.remove(max_score)
+                break
+            if right_rule(snake, max_score):
+                snake = snake + [max_score]
+                computer.remove(max_score)
+                break
+            if not score:
                 computer = computer + [stock[0]]
                 stock.remove(stock[0])
                 break
-            else:
-                if right_rule(snake, comp_move_val):
-                    snake = snake + [comp_move_val]
-                    computer.remove(comp_move_val)
-                    break
         status = "player"
